@@ -33,7 +33,7 @@ def custom_loss(y_true, y_pred):
 def frobenius(X, Y):
     return np.linalg.norm(X - Y, ord='fro')
 
-boat = np.loadtxt('data/boat.dat')
+boat = np.loadtxt('../08-svd/data/boat.dat')
 plt.figure()
 _ = plt.imshow(boat,cmap = cm.Greys_r)
 plt.show()
