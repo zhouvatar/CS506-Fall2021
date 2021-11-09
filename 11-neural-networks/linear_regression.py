@@ -1,39 +1,7 @@
-import math as m
 import numpy as np
 import matplotlib.pyplot as plt
-import sklearn.datasets as datasets
-from tensorflow import keras, math, random, stack
-from tensorflow.keras import layers, initializers
-from tensorflow.keras.activations import relu
-
-
-# 
-#       x[0] --- h1 
-#            \ /    \
-#             X       output
-#            / \    /
-#       x[1] --- h2
-#
-# This is the base model - nothing fancy here
-
-# modify this line
-ACTIVATION = "sigmoid"
-
-# DONT MODIFY
-# this is just for declaring
-LABEL = None
-THRESH = None
-# Set random seed for reproducibility
-np.random.seed(1)
-random.set_seed(1)
-
-if ACTIVATION=="tanh":
-    LABEL = -1
-    THRESH = 0
-if ACTIVATION=="sigmoid":
-    LABEL = 0
-    THRESH = 0.5
-
+from tensorflow import keras
+from tensorflow.keras import layers
 
 def custom_activation(x):
     return x**2
@@ -44,18 +12,46 @@ model.add(layers.Dense(1, input_dim=1, activation=custom_activation))
 model.compile(loss="mean_squared_error")
 
 log = np.array([1, 4])
-X = -10.0 + 20.0 * np.random.random(100)
+X = -2.0 + 4.0 * np.random.random(100)
 Y = log[0] + log[1] * X**2 + np.random.randn(100)
 
-plt.scatter(X, Y, s=100, alpha=.9)
+f, ax = plt.subplots()
+ax.scatter(X, Y, color='tab:red', s=100, alpha=.9)
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
 plt.show()
+
+f, ax = plt.subplots()
+ax.scatter(X**2, Y, color='tab:red', s=100, alpha=.9)
+ax.set_xlabel("X^2")
+ax.set_ylabel("Y")
+plt.show()
+
+m = np.shape(X)[0]
+X1 = np.array([np.ones(m),X]).T
+beta = np.linalg.inv(X1.T @ X1) @ X1.T @ Y
+
+xplot = np.linspace(-2,2,50)
+yestplot = beta[0]+beta[1]*xplot
+plt.plot(xplot,yestplot,lw=4)
+plt.scatter(X,Y, color='tab:red', s=100)
+plt.show()
+
+X2 = np.array([np.ones(m),X**2]).T
+beta = np.linalg.inv(X2.T @ X2) @ X2.T @ Y
+yestplot = beta[0]+beta[1]*xplot**2
 
 history = model.fit(X, Y, batch_size=50, epochs=1000)
 
-meshData = np.linspace(-10,10,50)
+fig, (ax1, ax2) = plt.subplots(1, 2)
+ax1.plot(xplot,yestplot,lw=4)
+ax1.scatter(X,Y, color='tab:red', s=100)
+ax1.set_title("Least Squares")
 
-fig, ax = plt.subplots()
+meshData = np.linspace(-2,2,50)
 Z = model.predict(meshData)
-plt.plot(meshData, Z)
-ax.scatter(X, Y, s=100, alpha=.9)
+
+ax2.plot(meshData, Z, lw=4)
+ax2.scatter(X, Y, color='tab:red', s=100, alpha=.9)
+ax2.set_title("Neural Network")
 plt.show()
